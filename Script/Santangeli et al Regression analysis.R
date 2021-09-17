@@ -140,7 +140,7 @@ plot(birds$naxes,birds$beta_total)
 birds <- birds[birds$naxes>4,] ; birds <- na.omit(birds)
 
 ## checking outliers
-dev.off() ; par(mfrow=c(4,2))
+dev.off() ; par(mfrow = c(4,2), mar = c(rep(2,4)))
 dotchart(birds$beta_repl, main= "Beta repl") #ok
 dotchart(birds$beta_diff, main= "Beta diff") #outlier to be omitted
 dotchart(birds$hab, main= "habitat") #ok
@@ -155,7 +155,7 @@ birds$Gen_log    <-  log(birds$Gen_Length+1)
 birds$diet_asin  <-  asin(birds$diet)
 
 #double check
-dev.off() ; par(mfrow=c(2,2))
+dev.off() ; par(mfrow = c(2,2),mar = c(rep(2,4)))
 dotchart(birds$mass_log, main= "mass_log") #ok
 dotchart(birds$Gen_log , main= "Gen_log ") #ok
 dotchart(birds$diet_asin , main= "diet_asin") #ok
@@ -263,11 +263,12 @@ phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
 birds_model2  <- birds_model[birds_model$beta_diff < 0.2,]
 birds_model2  <- na.omit(birds_model2)
 
+#Doesn't work!
 bird_M2 <- glmmTMB(beta_diff ~ mass + hab + diet + lat + red + (1 | year) + (1 | species), 
                    data = birds_model2, beta_family(link = "logit"))
 
-
 #Error messagge: there are 5 value = 0 in the response variable.
+
 range(db$beta_diff) 
 table(db$beta_diff)
 
@@ -347,7 +348,7 @@ plot(mamm$naxes,mamm$beta_total)
 mamm <- mamm[mamm$naxes>4,]
 
 ## checking outliers
-dev.off() ; par(mfrow=c(4,2))
+dev.off() ; par(mfrow=c(4,2),mar=c(rep(2,4)))
 dotchart(mamm$beta_repl, main= "Beta repl") #outlier
 dotchart(mamm$beta_diff, main= "Beta diff") #outlier 
 dotchart(mamm$hab, main= "habitat") #maybe an outlier. Trasform?
@@ -362,7 +363,7 @@ mamm$diet_asin  <-  asin(mamm$diet)
 mamm$hab_asin   <-  asin(mamm$hab)
 
 #double check
-dev.off() ; par(mfrow=c(2,2))
+dev.off() ; par(mfrow=c(2,2),mar=c(rep(2,4)))
 dotchart(mamm$mass_log, main= "mass_log") #ok
 dotchart(mamm$hab_asin , main= "hab_asin ") #ok
 dotchart(mamm$diet_asin , main= "diet_asin") #ok
@@ -596,23 +597,25 @@ dev.off()
 
 # How many species for each hypothesis ---------------------------------
 
-sum(nrow(mamm_tree_plot[mamm_tree_plot$beta_repl < 0.2 & mamm_tree_plot$beta_diff < 0.2,])) # HP 0
-sum(nrow(mamm_tree_plot[mamm_tree_plot$beta_diff >= 0.2,])) # HP 1
-sum(nrow(mamm_tree_plot[mamm_tree_plot$beta_repl >= 0.2,])) # HP 2
-sum(nrow(mamm_tree_plot[mamm_tree_plot$beta_repl >= 0.2 & mamm_tree_plot$beta_diff >= 0.2,])) # HP 3
+threshold <- 0.2
 
-sum(nrow(birds_tree_plot[birds_tree_plot$beta_repl < 0.2 & birds_tree_plot$beta_diff < 0.2,])) # HP 0
-sum(nrow(birds_tree_plot[birds_tree_plot$beta_diff >= 0.2,])) # HP 1
-sum(nrow(birds_tree_plot[birds_tree_plot$beta_repl >= 0.2,])) # HP 2
-sum(nrow(birds_tree_plot[birds_tree_plot$beta_repl >= 0.2 & birds_tree_plot$beta_diff >= 0.2,])) # HP 3
+sum(nrow(mamm_tree_plot[mamm_tree_plot$beta_repl < threshold & mamm_tree_plot$beta_diff < threshold,])) # HP 0
+sum(nrow(mamm_tree_plot[mamm_tree_plot$beta_diff >= threshold,])) # HP 1
+sum(nrow(mamm_tree_plot[mamm_tree_plot$beta_repl >= threshold,])) # HP 2
+sum(nrow(mamm_tree_plot[mamm_tree_plot$beta_repl >= threshold & mamm_tree_plot$beta_diff >= threshold,])) # HP 3
 
-HP0_mamm <- mamm_tree_plot[mamm_tree_plot$beta_repl < 0.2 & mamm_tree_plot$beta_diff < 0.2,]$Name_phylo
-HP2_mamm <- mamm_tree_plot[mamm_tree_plot$beta_repl >= 0.2,]$Name_phylo
+sum(nrow(birds_tree_plot[birds_tree_plot$beta_repl < threshold & birds_tree_plot$beta_diff < threshold,])) # HP 0
+sum(nrow(birds_tree_plot[birds_tree_plot$beta_diff >= threshold,])) # HP 1
+sum(nrow(birds_tree_plot[birds_tree_plot$beta_repl >= threshold,])) # HP 2
+sum(nrow(birds_tree_plot[birds_tree_plot$beta_repl >= threshold & birds_tree_plot$beta_diff >= threshold,])) # HP 3
 
-HP0_birds <- birds_tree_plot[birds_tree_plot$beta_repl < 0.2 & birds_tree_plot$beta_diff < 0.2,]$Name_phylo
-HP2_birds <- birds_tree_plot[birds_tree_plot$beta_repl >= 0.2,]$Name_phylo
+HP0_mamm <- mamm_tree_plot[mamm_tree_plot$beta_repl < threshold & mamm_tree_plot$beta_diff < threshold,]$Name_phylo
+HP2_mamm <- mamm_tree_plot[mamm_tree_plot$beta_repl >= threshold,]$Name_phylo
 
-# bind all 4 df and reorganize them
+HP0_birds <- birds_tree_plot[birds_tree_plot$beta_repl < threshold & birds_tree_plot$beta_diff < threshold,]$Name_phylo
+HP2_birds <- birds_tree_plot[birds_tree_plot$beta_repl >= threshold,]$Name_phylo
+
+# Bind all 4 df and reorganize them
 All_HP <- data.frame(species = c(HP0_birds, HP0_mamm, HP2_birds, HP2_mamm),
                      HP = c(rep("HP0_birds",length(HP0_birds)),
                             rep("HP0_mamm",length(HP0_mamm)),
@@ -707,3 +710,46 @@ pdf(file = "Figures/Figure 2.pdf", width = 10, height = 3)
 do.call("grid.arrange", c(grobs, nrow = 1, ncol = 2))
 
 dev.off()
+
+# Checking alternative thresholds --------------------------------------
+
+# Checking how species would fall in the different hypotheses 
+# using alternative thresholds
+
+threshold <- seq(from = 0, to = 1, by = 0.01)
+
+HP0 <- c()
+HP1 <- c()
+HP2 <- c()
+HP3 <- c()
+
+for(i in 1:length(threshold)) {
+  
+  HP0 <- append(HP0, sum(nrow(birds_tree_plot[birds_tree_plot$beta_repl < threshold[i] & birds_tree_plot$beta_diff < threshold[i],]))) # HP 0
+  HP1 <- append(HP1, sum(nrow(birds_tree_plot[birds_tree_plot$beta_diff >= threshold[i],]))) # HP 1
+  HP2 <- append(HP2, sum(nrow(birds_tree_plot[birds_tree_plot$beta_repl >= threshold[i],]))) # HP 2
+  HP3 <- append(HP3, sum(nrow(birds_tree_plot[birds_tree_plot$beta_repl >= threshold[i] & birds_tree_plot$beta_diff >= threshold[i],]))) # HP 3
+  
+}
+
+HP <- data.frame(threshold = rep(threshold,4),
+                 n         = c(HP0,HP1,HP2,HP3),
+                 ID        = c(rep("HP0", length(threshold)),
+                               rep("HP1", length(threshold)),
+                               rep("HP2", length(threshold)),
+                               rep("HP3", length(threshold))))
+
+(p9 <- ggplot(HP, aes(x = threshold, y = n)) + facet_grid(~ ID) +
+    geom_point(col="grey20", fill = "grey30") +
+    scale_x_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1)) +
+    labs(x = "Threshold", 
+         y = "Number of species") + theme_bw() + theme_ggplot)
+
+# and plot
+
+pdf(file = "Figures/Figure_S5.pdf", width = 10, height = 4)
+
+p9
+
+dev.off()
+

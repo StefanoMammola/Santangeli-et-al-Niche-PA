@@ -28,9 +28,9 @@ library("tidyr")
 
 # Loading the databases ---------------------------------------------------
 
-#Database not provided because exceed the size limit for GitHub. This can be accessed from FigShare.
+#Database is just an example with 10 species; the full database is not provided because it exceed the size limit for GitHub. 
 
-db2  <- read.csv("Data/AllBirdMammData_matched_FINAL15_7_21.csv", sep=",", header = TRUE, as.is = TRUE)
+db2  <- read.csv("Data/hypervolume_example_database.csv", sep=",", header = TRUE, as.is = TRUE)
 
 # Parallels ---------------------------------------------------------------
 

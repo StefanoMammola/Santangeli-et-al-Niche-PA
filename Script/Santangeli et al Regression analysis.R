@@ -130,7 +130,7 @@ for (i in 1:length(grobs)){
   grobs[[i]]$widths[2:5] <- as.list(maxwidth)
 }
 
-jpeg("Figures/Figure_S3.pdf", width = 10, height = 4)
+pdf("Figures/Figure_S3.pdf", width = 10, height = 4)
 do.call("grid.arrange", c(grobs, nrow = 1, ncol = 2))
 dev.off()
 
@@ -219,6 +219,25 @@ bird_M1 <- glmmTMB(beta_repl ~ mass + hab + diet + Diet_v + red + (1 | year) + (
 
 #Checking the model
 parameters::model_parameters(bird_M1)
+# Fixed Effects 
+
+# Parameter   | Coefficient |   SE |         95% CI |     z |      p
+# ------------------------------------------------------------------
+# (Intercept) |       -0.30 | 0.08 | [-0.46, -0.15] | -3.75 | < .001
+# mass        |        0.14 | 0.08 | [-0.01,  0.29] |  1.77 | 0.076 
+# hab         |        0.10 | 0.07 | [-0.05,  0.24] |  1.33 | 0.184 
+# diet        |   -8.06e-03 | 0.08 | [-0.16,  0.14] | -0.10 | 0.918 
+# Diet_v      |       -0.12 | 0.07 | [-0.26,  0.02] | -1.65 | 0.099 
+# red [1]     |        0.03 | 0.25 | [-0.45,  0.51] |  0.12 | 0.905 
+
+# # Random Effects 
+# 
+# Parameter               | Coefficient
+# -------------------------------------
+# SD (Intercept: year)    |    1.20e-05
+# SD (Intercept: species) |        0.45
+# SD (Residual)           |        1.82
+
 performance::check_model(bird_M1)
 
 #Checking for phylogenetic signal in the residuals
@@ -253,7 +272,6 @@ phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
 # P-value (based on LR test) : 1 
 
 # No phylo signal in the residuals!
-summary(bird_M1)
 (p3 <- sjPlot::plot_model(bird_M1, sort.est = FALSE, se = TRUE, col="black",
                    vline.color = "grey70",
                    title = "C - Habitat shift",
@@ -292,8 +310,29 @@ bird_M2 <- glmmTMB(beta_diff ~ mass + hab + diet + Diet_v + red + (1 | year) + (
                    data = birds_model2, beta_family(link = "logit"))
 
 #Checking the model
-performance::check_model(bird_M2)
 parameters::model_parameters(bird_M2)
+
+# Fixed Effects 
+
+# Parameter   | Coefficient |   SE |         95% CI |      z |      p
+# -------------------------------------------------------------------
+# (Intercept) |       -3.98 | 0.11 | [-4.20, -3.76] | -35.98 | < .001
+# mass        |        0.01 | 0.08 | [-0.15,  0.17] |   0.12 | 0.905 
+# hab         |       -0.03 | 0.08 | [-0.18,  0.12] |  -0.39 | 0.699 
+# diet        |       -0.10 | 0.08 | [-0.27,  0.06] |  -1.23 | 0.218 
+# Diet_v      |       -0.11 | 0.08 | [-0.26,  0.04] |  -1.39 | 0.165 
+# red [1]     |        0.32 | 0.26 | [-0.19,  0.83] |   1.24 | 0.216 
+# 
+# # Random Effects 
+# 
+# Parameter               | Coefficient
+# -------------------------------------
+# SD (Intercept: year)    |        0.10
+# SD (Intercept: species) |        0.59
+# SD (Residual)           |        6.82
+
+
+performance::check_model(bird_M2)
 
 #Checking for phylogenetic signal in the residuals
 res <- residuals(bird_M2)
@@ -414,6 +453,26 @@ mamm_M1 <- glmmTMB(beta_repl ~ mass + hab + diet + Diet_vertebrates + red + (1|y
 
 #Checking the model
 parameters::model_parameters(mamm_M1)
+
+# # Fixed Effects 
+# 
+# Parameter        | Coefficient |   SE |        95% CI |     z |     p
+# ---------------------------------------------------------------------
+# (Intercept)      |       -0.20 | 0.14 | [-0.47, 0.08] | -1.37 | 0.170
+# mass             |       -0.05 | 0.14 | [-0.33, 0.22] | -0.39 | 0.699
+# hab              |       -0.17 | 0.14 | [-0.43, 0.10] | -1.24 | 0.216
+# diet             |        0.11 | 0.13 | [-0.15, 0.37] |  0.85 | 0.398
+# Diet_vertebrates |   -3.96e-03 | 0.14 | [-0.28, 0.27] | -0.03 | 0.978
+# red [1]          |       -0.36 | 0.33 | [-1.00, 0.28] | -1.10 | 0.271
+# 
+# # Random Effects 
+# 
+# Parameter               | Coefficient
+# -------------------------------------
+# SD (Intercept: year)    |    2.14e-05
+# SD (Intercept: species) |        0.52
+# SD (Residual)           |        4.48
+
 performance::check_model(mamm_M1)
 
 #Checking for phylogenetic signal in the residuals
@@ -462,6 +521,26 @@ mamm_M2 <- glmmTMB(beta_diff ~ mass + hab + diet + Diet_vertebrates + red +(1|ye
 
 #Checking the model
 parameters::model_parameters(mamm_M2)
+
+# # Fixed Effects 
+# 
+# Parameter        | Coefficient |   SE |         95% CI |      z |      p
+# ------------------------------------------------------------------------
+# (Intercept)      |       -3.72 | 0.20 | [-4.12, -3.33] | -18.55 | < .001
+# mass             |       -0.06 | 0.19 | [-0.43,  0.31] |  -0.32 | 0.745 
+# hab              |    4.26e-03 | 0.18 | [-0.34,  0.35] |   0.02 | 0.981 
+# diet             |        0.41 | 0.18 | [ 0.06,  0.76] |   2.31 | 0.021 
+# Diet_vertebrates |       -0.05 | 0.18 | [-0.41,  0.32] |  -0.26 | 0.797 
+# red [1]          |       -0.26 | 0.44 | [-1.11,  0.59] |  -0.60 | 0.550 
+# 
+# # Random Effects 
+# 
+# Parameter               | Coefficient
+# -------------------------------------
+# SD (Intercept: year)    |    2.77e-05
+# SD (Intercept: species) |        0.60
+# SD (Residual)           |        6.16
+
 performance::check_model(mamm_M2)
 
 #Checking for phylogenetic signal in the residuals

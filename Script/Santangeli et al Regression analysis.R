@@ -130,7 +130,7 @@ for (i in 1:length(grobs)){
   grobs[[i]]$widths[2:5] <- as.list(maxwidth)
 }
 
-pdf("Figures/Figure_S3.pdf", width = 10, height = 4)
+pdf("Figures/Figure S3.pdf", width = 10, height = 4)
 do.call("grid.arrange", c(grobs, nrow = 1, ncol = 2))
 dev.off()
 
@@ -219,24 +219,25 @@ bird_M1 <- glmmTMB(beta_repl ~ mass + hab + diet + Diet_v + red + (1 | year) + (
 
 #Checking the model
 parameters::model_parameters(bird_M1)
+
 # Fixed Effects 
 
 # Parameter   | Coefficient |   SE |         95% CI |     z |      p
 # ------------------------------------------------------------------
-# (Intercept) |       -0.30 | 0.08 | [-0.46, -0.15] | -3.75 | < .001
-# mass        |        0.14 | 0.08 | [-0.01,  0.29] |  1.77 | 0.076 
-# hab         |        0.10 | 0.07 | [-0.05,  0.24] |  1.33 | 0.184 
-# diet        |   -8.06e-03 | 0.08 | [-0.16,  0.14] | -0.10 | 0.918 
-# Diet_v      |       -0.12 | 0.07 | [-0.26,  0.02] | -1.65 | 0.099 
-# red [1]     |        0.03 | 0.25 | [-0.45,  0.51] |  0.12 | 0.905 
+# (Intercept) |       -0.30 | 0.08 | [-0.46, -0.13] | -3.54 | < .001
+# mass        |        0.14 | 0.08 | [-0.01,  0.30] |  1.83 | 0.067 
+# hab         |        0.09 | 0.07 | [-0.05,  0.24] |  1.26 | 0.206 
+# diet        |   -5.04e-03 | 0.08 | [-0.16,  0.15] | -0.07 | 0.948 
+# Diet_v      |       -0.13 | 0.07 | [-0.27,  0.02] | -1.73 | 0.084 
+# red [1]     |        0.05 | 0.24 | [-0.42,  0.53] |  0.22 | 0.826 
 
 # # Random Effects 
 # 
 # Parameter               | Coefficient
 # -------------------------------------
-# SD (Intercept: year)    |    1.20e-05
-# SD (Intercept: species) |        0.45
-# SD (Residual)           |        1.82
+# SD (Intercept: year)    |        0.01
+# SD (Intercept: species) |        0.42
+# SD (Residual)           |        1.78
 
 performance::check_model(bird_M1)
 
@@ -267,8 +268,8 @@ birds_test   <- birds_test[order(match(rownames(birds_test), BirdTreeList)),] # 
 phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
 
 # Phylogenetic signal lambda : 6.68102e-05 
-# logL(lambda) : 65.809 
-# LR(lambda=0) : -0.00311138 
+# logL(lambda) : 62.674 
+# LR(lambda=0) : -0.003054 
 # P-value (based on LR test) : 1 
 
 # No phylo signal in the residuals!
@@ -294,9 +295,7 @@ birds_model2  <- na.omit(birds_model2)
 #Doesn't work!
 bird_M2 <- glmmTMB(beta_diff ~ mass + hab + diet + Diet_v + red + (1 | year) + (1 | species), 
                    data = birds_model2, beta_family(link = "logit"))
-
 #Error messagge: there are 5 value = 0 in the response variable.
-
 range(db$beta_diff) 
 table(db$beta_diff)
 
@@ -312,25 +311,22 @@ bird_M2 <- glmmTMB(beta_diff ~ mass + hab + diet + Diet_v + red + (1 | year) + (
 #Checking the model
 parameters::model_parameters(bird_M2)
 
-# Fixed Effects 
-
 # Parameter   | Coefficient |   SE |         95% CI |      z |      p
 # -------------------------------------------------------------------
-# (Intercept) |       -3.98 | 0.11 | [-4.20, -3.76] | -35.98 | < .001
-# mass        |        0.01 | 0.08 | [-0.15,  0.17] |   0.12 | 0.905 
-# hab         |       -0.03 | 0.08 | [-0.18,  0.12] |  -0.39 | 0.699 
-# diet        |       -0.10 | 0.08 | [-0.27,  0.06] |  -1.23 | 0.218 
-# Diet_v      |       -0.11 | 0.08 | [-0.26,  0.04] |  -1.39 | 0.165 
-# red [1]     |        0.32 | 0.26 | [-0.19,  0.83] |   1.24 | 0.216 
-# 
+# (Intercept) |       -3.98 | 0.14 | [-4.26, -3.71] | -28.17 | < .001
+# mass        |       -0.04 | 0.10 | [-0.24,  0.15] |  -0.45 | 0.656 
+# hab         |        0.09 | 0.10 | [-0.10,  0.27] |   0.89 | 0.375 
+# diet        |       -0.02 | 0.10 | [-0.21,  0.18] |  -0.18 | 0.859 
+# Diet_v      |        0.04 | 0.08 | [-0.13,  0.20] |   0.44 | 0.663 
+# red [1]     |       -0.02 | 0.32 | [-0.65,  0.61] |  -0.07 | 0.945
+
 # # Random Effects 
 # 
 # Parameter               | Coefficient
 # -------------------------------------
-# SD (Intercept: year)    |        0.10
-# SD (Intercept: species) |        0.59
-# SD (Residual)           |        6.82
-
+# SD (Intercept: year)    |        0.15
+# SD (Intercept: species) |        0.76
+# SD (Residual)           |        5.68
 
 performance::check_model(bird_M2)
 
@@ -352,8 +348,8 @@ birds_test <- birds_test[order(match(rownames(birds_test), BirdTreeList)),] # re
 phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
 
 # Phylogenetic signal lambda : 6.68102e-05 
-# logL(lambda) : 317.585 
-# LR(lambda=0) : -0.00374005 
+# logL(lambda) : 291.166 
+# LR(lambda=0) : -0.00459575 
 # P-value (based on LR test) : 1 
 
 # No phylo signal in the residuals! 
@@ -373,7 +369,7 @@ phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
 
 # Analysis with mammals -----------------------------------------------------
 
-mamm <- db[db$Group == "mammal",]
+mamm <- db[db$Group == "mammal",] ; droplevels(mamm)
 
 #### Data exploration
 
@@ -424,10 +420,10 @@ psych::pairs.panels(mamm[,c("beta_repl","beta_diff","hab_asin","diet_asin","mass
 mamm <- within(mamm, year <- relevel(year, ref = "2018s"))
 
 # scale and center all continuous variables before analyses
-mamm$mass_log  <-  scale(mamm$mass_log, center = TRUE, scale = TRUE)
-mamm$hab       <-  scale(mamm$hab_asin, center = TRUE, scale = TRUE)
-mamm$diet_asin <-  scale(mamm$diet_asin, center = TRUE, scale = TRUE)
-mamm$Diet_vertebrates       <-  scale(mamm$Diet_vertebrates, center = TRUE, scale = TRUE)
+mamm$mass_log  <- scale(mamm$mass_log, center = TRUE, scale = TRUE)
+mamm$hab       <- scale(mamm$hab_asin, center = TRUE, scale = TRUE)
+mamm$diet_asin <- scale(mamm$diet_asin, center = TRUE, scale = TRUE)
+mamm$Diet_vertebrates <- scale(mamm$Diet_vertebrates, center = TRUE, scale = TRUE)
  
 #creating a new dataframe
 mamm_model <- data.frame(species = mamm$Species,
@@ -456,22 +452,22 @@ parameters::model_parameters(mamm_M1)
 
 # # Fixed Effects 
 # 
-# Parameter        | Coefficient |   SE |        95% CI |     z |     p
-# ---------------------------------------------------------------------
-# (Intercept)      |       -0.20 | 0.14 | [-0.47, 0.08] | -1.37 | 0.170
-# mass             |       -0.05 | 0.14 | [-0.33, 0.22] | -0.39 | 0.699
-# hab              |       -0.17 | 0.14 | [-0.43, 0.10] | -1.24 | 0.216
-# diet             |        0.11 | 0.13 | [-0.15, 0.37] |  0.85 | 0.398
-# Diet_vertebrates |   -3.96e-03 | 0.14 | [-0.28, 0.27] | -0.03 | 0.978
-# red [1]          |       -0.36 | 0.33 | [-1.00, 0.28] | -1.10 | 0.271
-# 
+# Parameter        | Coefficient |   SE |         95% CI |     z |     p
+# ----------------------------------------------------------------------
+# (Intercept)      |       -0.33 | 0.11 | [-0.55, -0.10] | -2.87 | 0.004
+# mass             |       -0.09 | 0.12 | [-0.32,  0.15] | -0.73 | 0.468
+# hab              |       -0.11 | 0.10 | [-0.31,  0.10] | -1.00 | 0.316
+# diet             |        0.04 | 0.10 | [-0.16,  0.25] |  0.40 | 0.687
+# Diet_vertebrates |       -0.11 | 0.12 | [-0.35,  0.13] | -0.90 | 0.371
+# red [1]          |       -0.04 | 0.29 | [-0.61,  0.52] | -0.14 | 0.886
+
 # # Random Effects 
 # 
 # Parameter               | Coefficient
 # -------------------------------------
-# SD (Intercept: year)    |    2.14e-05
-# SD (Intercept: species) |        0.52
-# SD (Residual)           |        4.48
+# SD (Intercept: year)    |        0.04
+# SD (Intercept: species) |        0.37
+# SD (Residual)           |        4.39
 
 performance::check_model(mamm_M1)
 
@@ -485,6 +481,7 @@ mamm_test <- mamm_test %>% group_by(name_phylo) %>% summarise_at(vars(c("residua
 mamm_test <- data.frame(mamm_test)
 rownames(mamm_test) <- make.names(mamm_test$name_phylo, unique = TRUE)
 
+
 # Checking match of names in the phylogenetic tree 
 unique(mammTREE$tip.label %in% mamm_test$name_phylo) # all good now
 
@@ -493,9 +490,9 @@ mamm_test    <- mamm_test[order(match(rownames(mamm_test), MammTreeList)),] # re
 
 phylosig(mammTREE, mamm_test$residuals, method = "lambda", test = TRUE)
 
-# Phylogenetic signal lambda : 6.95863e-05 
-# logL(lambda) : 14.2156 
-# LR(lambda=0) : -0.00100615 
+# Phylogenetic signal lambda : 6.94123e-05 
+# logL(lambda) : 34.2737 
+# LR(lambda=0) : -0.000826767 
 # P-value (based on LR test) : 1 
 
 # No phylo signal in the residuals! 
@@ -526,20 +523,21 @@ parameters::model_parameters(mamm_M2)
 # 
 # Parameter        | Coefficient |   SE |         95% CI |      z |      p
 # ------------------------------------------------------------------------
-# (Intercept)      |       -3.72 | 0.20 | [-4.12, -3.33] | -18.55 | < .001
-# mass             |       -0.06 | 0.19 | [-0.43,  0.31] |  -0.32 | 0.745 
-# hab              |    4.26e-03 | 0.18 | [-0.34,  0.35] |   0.02 | 0.981 
-# diet             |        0.41 | 0.18 | [ 0.06,  0.76] |   2.31 | 0.021 
-# Diet_vertebrates |       -0.05 | 0.18 | [-0.41,  0.32] |  -0.26 | 0.797 
-# red [1]          |       -0.26 | 0.44 | [-1.11,  0.59] |  -0.60 | 0.550 
-# 
+# (Intercept)      |       -3.12 | 0.10 | [-3.32, -2.92] | -30.68 | < .001
+# mass             |       -0.13 | 0.09 | [-0.32,  0.06] |  -1.36 | 0.173 
+# hab              |       -0.02 | 0.09 | [-0.20,  0.16] |  -0.23 | 0.816 
+# diet             |        0.12 | 0.09 | [-0.05,  0.30] |   1.40 | 0.162 
+# Diet_vertebrates |        0.02 | 0.10 | [-0.17,  0.21] |   0.23 | 0.818 
+# red [1]          |       -0.48 | 0.27 | [-1.02,  0.06] |  -1.74 | 0.081 
+
+# # 
 # # Random Effects 
 # 
 # Parameter               | Coefficient
 # -------------------------------------
-# SD (Intercept: year)    |    2.77e-05
-# SD (Intercept: species) |        0.60
-# SD (Residual)           |        6.16
+# SD (Intercept: year)    |    1.40e-09
+# SD (Intercept: species) |    1.06e-04
+# SD (Residual)           |        6.23
 
 performance::check_model(mamm_M2)
 
@@ -558,10 +556,10 @@ mamm_test <- mamm_test[order(match(rownames(mamm_test), MammTreeList)),] # reord
 
 phylosig(mammTREE, mamm_test$residuals, method = "lambda", test = TRUE)
 
-# Phylogenetic signal lambda : 6.95863e-05 
-# logL(lambda) : 62.7059 
-# LR(lambda=0) : -0.0011535 
-# P-value (based on LR test) : 1  
+# Phylogenetic signal lambda : 6.94123e-05 
+# logL(lambda) : 34.2737 
+# LR(lambda=0) : -0.000826767 
+# P-value (based on LR test) : 1 
 
 # No phylo signal in the residuals!
 
@@ -596,21 +594,21 @@ pdf(file = "Figures/Figure 5.pdf", width = 12, height = 10)
 do.call("grid.arrange", c(grobs, nrow = 2, ncol = 2))
 dev.off()
 
-## Check mass result --- Figure S4
+## Check result --- Figure S4 (not significant anymore)
 
-mamm_model$expansion <- ifelse(mamm_model$vol > 0,"Contraction outside protected areas", "Expansion outside protected areas")
-
-(s4<- ggplot(mamm_model, aes(x = diet, fill = expansion, color = expansion)) +
-  geom_density(alpha =.5) +  labs(x = "Diet specialization (scaled)" , y = "Density")+
-  scale_fill_manual(values =  c( "orange","grey20")) +
-  scale_color_manual(values =  c("orange","grey20")) + theme_bw() + theme_ggplot + theme(legend.title = element_blank(),
-                                                                                         legend.position = c(0.2, 0.88),
-                                                                                         legend.background = element_rect(fill='transparent'))
-  )
-
-pdf("Figures/Figure_S4.pdf", width = 8, height = 4)
-s4
-dev.off()
+# mamm_model$expansion <- ifelse(mamm_model$vol > 0,"Contraction outside protected areas", "Expansion outside protected areas")
+# 
+# (s4<- ggplot(mamm_model, aes(x = diet, fill = expansion, color = expansion)) +
+#   geom_density(alpha =.5) +  labs(x = "Diet specialization (scaled)" , y = "Density")+
+#   scale_fill_manual(values =  c( "orange","grey20")) +
+#   scale_color_manual(values =  c("orange","grey20")) + theme_bw() + theme_ggplot + theme(legend.title = element_blank(),
+#                                                                                          legend.position = c(0.2, 0.88),
+#                                                                                          legend.background = element_rect(fill='transparent'))
+#   )
+# 
+# pdf("Figures/Figure S4.pdf", width = 8, height = 4)
+# s4
+# dev.off()
 
 # Plotting the value on the phylogeny -------------------------------------
 
@@ -860,6 +858,24 @@ HP2 <- left_join(HP, Data4hp, by = c("HP", "Red"))
 # Turn Nas in the n to Zeros:
 HP2 <- HP2 %>% mutate_at(vars("n"), ~replace(., is.na(.), 0)) 
 
+#           HP Red  n
+# 1  HP0_birds   0 13
+# 2  HP1_birds   0  0
+# 3  HP2_birds   0 69
+# 4  HP3_birds   0  0
+# 5   HP0_mamm   0  1
+# 6   HP1_mamm   0  0
+# 7   HP2_mamm   0 16
+# 8   HP3_mamm   0  0
+# 9  HP0_birds   1  2
+# 10 HP1_birds   1  0
+# 11 HP2_birds   1  8
+# 12 HP3_birds   1  0
+# 13  HP0_mamm   1  1
+# 14  HP1_mamm   1  0
+# 15  HP2_mamm   1  3
+# 16  HP3_mamm   1  0
+
 # Now I have the DF for the figures:
 birdsDF <- HP2[c(1:4, 9:12) ,]  ; birdsDF <- gdata::drop.levels(birdsDF)
 mammDF  <- HP2[c(5:8, 13:16) ,] ; mammDF  <- gdata::drop.levels(mammDF) 
@@ -916,7 +932,7 @@ for (i in 1:length(grobs)){
   grobs[[i]]$widths[2:5] <- as.list(maxwidth)
 }
 
-pdf(file = "Figures/Figure_2.pdf", width = 10, height = 3)
+pdf(file = "Figures/Figure 2.pdf", width = 10, height = 3)
 
 do.call("grid.arrange", c(grobs, nrow = 1, ncol = 2))
 
@@ -1073,7 +1089,7 @@ HP <- data.frame(threshold = rep(threshold,4),
 
 # and plot
 
-pdf(file = "Figures/new Figure_S5.pdf", width = 10, height = 4)
+pdf(file = "Figures/Figure S5.pdf", width = 10, height = 4)
 
 p9
 

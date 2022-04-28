@@ -1,5 +1,5 @@
 ## ------------------------------------------------------------------------
-## 'Effects of protected areas on ecological niche properties of terrestrial vertebrates'
+## 'The effects of protected areas on the ecological niches of birds and mammals'
 ## ------------------------------------------------------------------------
 
 # Santangeli et al.
@@ -89,34 +89,32 @@ birdTREE <- read.tree("Data/birdTree.tre")
 
 # Checking the difference in volume and beta withing and outside ----------
 
-plot <- db[db$naxes == 7,]
-
-(p1 <- ggplot(data = plot[plot$Group == "bird",], 
+(p1 <- ggplot(data = db[db$Group == "bird" & db$naxes > 5,],  #if only 7 axes are shown, we lose year 2000s
               aes(x = year, y = delta_vol)) +
     geom_point(aes(x = year, y = delta_vol), 
                position = position_jitter(width = 0.15), size = 1, alpha = 0.2) +
     geom_boxplot(width = 0.4, outlier.shape = NA, alpha = 0.4, fill="grey50") +
-      geom_hline(yintercept=0,col="blue",fill="gray60",lty="dotted")+
+      geom_hline(yintercept=0,col="blue",lty="dotted")+
       labs(title = "A", subtitle = "Birds",
              y = "Delta volume\n(Volume in protected - unprotected)", x = NULL) +
-         guides(fill = FALSE, color = FALSE) +
+         guides(fill = "none", color = "none") +
       theme_classic() + theme_ggplot
 )
 
-(p2 <- ggplot(data = plot[plot$Group == "mammal",], 
+(p2 <- ggplot(data = db[db$Group == "mammal" & db$naxes > 6,], 
               aes(x = year, y = delta_vol)) +
     geom_point(aes(x = year, y = delta_vol), 
                position = position_jitter(width = 0.15), size = 1, alpha = 0.2) +
     geom_boxplot(width = 0.4, outlier.shape = NA, alpha = 0.4, fill="grey50") +
-    geom_hline(yintercept=0,col="blue",fill="gray60",lty="dotted")+
+    geom_hline(yintercept=0,col="blue",lty="dotted")+
     labs(title = "B", subtitle = "Mammal", 
          y = "Delta volume\n(Volume in protected - unprotected)", x = NULL) +
     
-   guides(fill = FALSE, color = FALSE) +
+   guides(fill = "none", color = "none") +
     theme_classic() + theme_ggplot
 )
 
-## Supplementary Figures S3
+## Supplementary Figures S4
 plots <- list(p1, p2) ; grobs <- list() ; widths <- list()
 
 for (i in 1:length(plots)){
@@ -130,7 +128,7 @@ for (i in 1:length(grobs)){
   grobs[[i]]$widths[2:5] <- as.list(maxwidth)
 }
 
-pdf("Figures/Figure S3.pdf", width = 10, height = 4)
+pdf("Figures/Figure S4.pdf", width = 10, height = 4)
 do.call("grid.arrange", c(grobs, nrow = 1, ncol = 2))
 dev.off()
 
@@ -543,7 +541,7 @@ performance::check_model(mamm_M2)
 
 #Checking for phylogenetic signal in the residuals
 res <- residuals(mamm_M2)
-mamm_test <- data.frame(mamm_model2, 
+mamm_test <- data.frame(mamm_model, 
                         residuals = residuals(mamm_M2)) 
 
 mamm_test <- mamm_test %>% group_by(name_phylo) %>% summarise_at(vars(c("residuals")), funs(mean(., na.rm=TRUE)))
@@ -625,7 +623,7 @@ mammTREE$tip.label <- paste("  ", mammTREE$tip.label,sep='')
 mammTREE$tip.label <- gsub('_', ' ', mammTREE$tip.label)
 
 #renaming Castor fiber to castor sp.
-mammTREE$tip.label[20] <- "  Castor sp."
+mammTREE$tip.label[19] <- "  Castor sp."
 
 length(mamm_tree_plot$beta_repl)
 length(mammTREE$tip.label)

@@ -1,5 +1,5 @@
 ## ------------------------------------------------------------------------
-## 'Effects of protected areas on ecological niche properties of terrestrial vertebrates'
+## 'The effects of protected areas on the ecological niches of birds and mammals'
 ## ------------------------------------------------------------------------
 
 # Santangeli et al.

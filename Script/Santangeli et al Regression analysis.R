@@ -87,51 +87,6 @@ db$Name_phylo <- gsub(' ', '_', db$Name_phylo)
 mammTREE <- read.tree("Data/mammTree.tre")
 birdTREE <- read.tree("Data/birdTree.tre")
 
-# Checking the difference in volume and beta withing and outside ----------
-
-(p1 <- ggplot(data = db[db$Group == "bird" & db$naxes > 5,],  #if only 7 axes are shown, we lose year 2000s
-              aes(x = year, y = delta_vol)) +
-    geom_point(aes(x = year, y = delta_vol), 
-               position = position_jitter(width = 0.15), size = 1, alpha = 0.2) +
-    geom_boxplot(width = 0.4, outlier.shape = NA, alpha = 0.4, fill="grey50") +
-      geom_hline(yintercept=0,col="blue",lty="dotted")+
-      labs(title = "A", subtitle = "Birds",
-             y = "Delta volume\n(Volume in protected - unprotected)", x = NULL) +
-         guides(fill = "none", color = "none") +
-      theme_classic() + theme_ggplot
-)
-
-(p2 <- ggplot(data = db[db$Group == "mammal" & db$naxes > 6,], 
-              aes(x = year, y = delta_vol)) +
-    geom_point(aes(x = year, y = delta_vol), 
-               position = position_jitter(width = 0.15), size = 1, alpha = 0.2) +
-    geom_boxplot(width = 0.4, outlier.shape = NA, alpha = 0.4, fill="grey50") +
-    geom_hline(yintercept=0,col="blue",lty="dotted")+
-    labs(title = "B", subtitle = "Mammal", 
-         y = "Delta volume\n(Volume in protected - unprotected)", x = NULL) +
-    
-   guides(fill = "none", color = "none") +
-    theme_classic() + theme_ggplot
-)
-
-## Supplementary Figures S4
-plots <- list(p1, p2) ; grobs <- list() ; widths <- list()
-
-for (i in 1:length(plots)){
-  grobs[[i]] <- ggplotGrob(plots[[i]])
-  widths[[i]] <- grobs[[i]]$widths[2:5]
-}
-
-maxwidth <- do.call(grid::unit.pmax, widths)
-
-for (i in 1:length(grobs)){
-  grobs[[i]]$widths[2:5] <- as.list(maxwidth)
-}
-
-pdf("Figures/Figure S4.pdf", width = 10, height = 4)
-do.call("grid.arrange", c(grobs, nrow = 1, ncol = 2))
-dev.off()
-
 # Analysis with birds -----------------------------------------------------
 
 birds <- db[db$Group == "bird",]
@@ -151,8 +106,8 @@ dotchart(birds$beta_diff, main= "Beta diff") #outlier to be omitted
 dotchart(birds$hab, main= "habitat") #ok
 dotchart(birds$diet, main= "diet") #maybe an outlier. Trasform?
 dotchart(birds$Diet_vertebrates, main= "Diet Vertebrate") #log trasform!
-dotchart(birds$mass, main= "mass") #log transform!
-dotchart(birds$Gen_Length, main= "Gen_length") #log trasform!
+dotchart(birds$mass, main = "mass") #log transform!
+dotchart(birds$Gen_Length, main = "Gen_length") #log trasform!
 dotchart(birds$Diet_vertebrates, main= "Diet_vert") #log trasform!
 
 # transforming variables
@@ -169,6 +124,12 @@ dotchart(birds$diet_asin , main= "diet_asin") #ok
 # Check collinearity
 psych::pairs.panels(birds[,c("hab","diet_asin","gen_log","mass_log","Diet_vertebrates")]) 
 #mass and generation are collinear! We select only mass
+
+pdf(file = "Figures/Figure Collinearity bird.pdf", width = 7, height = 5)
+
+psych::pairs.panels(birds[,c("hab","diet_asin","gen_log","mass_log","Diet_vertebrates")]) 
+
+dev.off()
 
 #Checking association with categorical
 boxplot(mass_log ~ red, data = birds)
@@ -239,6 +200,10 @@ parameters::model_parameters(bird_M1)
 
 performance::check_model(bird_M1)
 
+pdf(file = "Figures/Validation M1.pdf", width = 8, height = 6)
+performance::check_model(bird_M1)
+dev.off()
+
 #Checking for phylogenetic signal in the residuals
 res <- residuals(bird_M1)
 birds_test <- data.frame(birds_model, 
@@ -271,7 +236,7 @@ phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
 # P-value (based on LR test) : 1 
 
 # No phylo signal in the residuals!
-(p3 <- sjPlot::plot_model(bird_M1, sort.est = FALSE, se = TRUE, col="black",
+(p3 <- sjPlot::plot_model(bird_M1, sort.est = FALSE, se = FALSE, col="black", ci.lvl = .95,
                    vline.color = "grey70",
                    title = "C - Habitat shift",
                    show.values = TRUE, value.offset = .3,
@@ -282,7 +247,7 @@ phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
                                     xmin = unit(1, "native"), xmax = unit(1.8,"native"),
                                     ymin = unit(0.3,"npc"),  ymax = unit(1,"npc"))+ 
   
-               theme_bw() + theme_ggplot)
+               theme_bw() + ylab("Estimated beta [95% Confenfidence interval]") + theme_ggplot)
 
 # Model for expantion/contraction
 
@@ -328,6 +293,10 @@ parameters::model_parameters(bird_M2)
 
 performance::check_model(bird_M2)
 
+pdf(file = "Figures/Validation M2.pdf", width = 8, height = 6)
+performance::check_model(bird_M2)
+dev.off()
+
 #Checking for phylogenetic signal in the residuals
 res <- residuals(bird_M2)
 birds_test <- data.frame(birds_model2, 
@@ -352,7 +321,7 @@ phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
 
 # No phylo signal in the residuals! 
 
-(p1 <- sjPlot::plot_model(bird_M2, sort.est = FALSE, se = TRUE, col="black",
+(p1 <- sjPlot::plot_model(bird_M2, sort.est = FALSE, se = FALSE, col="black", ci.lvl = .95,
                    vline.color ="grey70",
                    title = "A - Niche expansion",
                    show.values = TRUE, value.offset = .3, axis.title = " ",
@@ -401,6 +370,11 @@ dotchart(mamm$diet_asin , main= "diet_asin") #ok
 # Check collinearity
 psych::pairs.panels(mamm[,c("hab_asin","diet_asin","mass_log","Gen_Length","Diet_vertebrates")]) 
 #mass and generation are collinear! We select only mass
+
+# saving the figure
+pdf(file = "Figures/Figure Collinearity mammals.pdf", width = 7, height = 5)
+psych::pairs.panels(mamm[,c("hab_asin","diet_asin","mass_log","Gen_Length","Diet_vertebrates")]) 
+dev.off()
 
 #Checking association with categorical
 boxplot(mass_log ~ red, data = mamm)
@@ -469,6 +443,10 @@ parameters::model_parameters(mamm_M1)
 
 performance::check_model(mamm_M1)
 
+pdf(file = "Figures/Validation M3.pdf", width = 8, height = 6)
+performance::check_model(mamm_M1)
+dev.off()
+
 #Checking for phylogenetic signal in the residuals
 res <- residuals(mamm_M1)
 mamm_test <- data.frame(mamm_model, 
@@ -478,7 +456,6 @@ mamm_test <- mamm_test %>% group_by(name_phylo) %>% summarise_at(vars(c("residua
 
 mamm_test <- data.frame(mamm_test)
 rownames(mamm_test) <- make.names(mamm_test$name_phylo, unique = TRUE)
-
 
 # Checking match of names in the phylogenetic tree 
 unique(mammTREE$tip.label %in% mamm_test$name_phylo) # all good now
@@ -495,15 +472,17 @@ phylosig(mammTREE, mamm_test$residuals, method = "lambda", test = TRUE)
 
 # No phylo signal in the residuals! 
 
-(p4 <- sjPlot::plot_model(mamm_M1, sort.est = FALSE, se = TRUE, col = "black",
+(p4 <- sjPlot::plot_model(mamm_M1, sort.est = FALSE, se = FALSE, col = "black", ci.lvl = .95,
                    vline.color ="grey70",
                    title = "D - Habitat shift",
                    show.values = TRUE, value.offset = .3,
                    axis.labels = c(rep(" ",5))) + theme_bw() + 
     
                     annotation_custom(grid::rasterGrob(Silu_mamm),
-                      xmin = unit(1, "native"), xmax = unit(1.8,"native"),
-                      ymin = unit(0.4,"npc"),  ymax = unit(1,"npc"))+ 
+                      xmin = unit(0.8, "native"), xmax = unit(1.5,"native"),
+                      ymin = unit(0.3,"npc"),  ymax = unit(1.2,"npc"))+ 
+    
+             ylab("Estimated beta [95% Confenfidence interval]") +
     
                    theme_ggplot)
 
@@ -537,7 +516,9 @@ parameters::model_parameters(mamm_M2)
 # SD (Intercept: species) |    1.06e-04
 # SD (Residual)           |        6.23
 
+pdf(file = "Figures/Validation M4.pdf", width = 8, height = 6)
 performance::check_model(mamm_M2)
+dev.off()
 
 #Checking for phylogenetic signal in the residuals
 res <- residuals(mamm_M2)
@@ -561,15 +542,15 @@ phylosig(mammTREE, mamm_test$residuals, method = "lambda", test = TRUE)
 
 # No phylo signal in the residuals!
 
-(p2 <- sjPlot::plot_model(mamm_M2, sort.est = FALSE, se = TRUE, col= "black",
+(p2 <- sjPlot::plot_model(mamm_M2, sort.est = FALSE, se = FALSE, col = "black", ci.lvl = .95,
                    vline.color ="grey70",
                    title = "B - Niche expansion", axis.title = " ",
                    show.values = TRUE, value.offset = .3,
                    axis.labels = c(rep(" ",5))) +
     
                    annotation_custom(grid::rasterGrob(Silu_mamm),
-                      xmin = unit(1, "native"), xmax = unit(1.8,"native"),
-                      ymin = unit(0.4,"npc"),  ymax = unit(1,"npc"))+ 
+                      xmin = unit(1, "native"), xmax = unit(2,"native"),
+                      ymin = unit(0.3,"npc"),  ymax = unit(.7,"npc"))+ 
                   
                     theme_bw() + theme_ggplot)
 
@@ -591,22 +572,6 @@ for (i in 1:length(grobs)){
 pdf(file = "Figures/Figure 5.pdf", width = 12, height = 10)
 do.call("grid.arrange", c(grobs, nrow = 2, ncol = 2))
 dev.off()
-
-## Check result --- Figure S4 (not significant anymore)
-
-# mamm_model$expansion <- ifelse(mamm_model$vol > 0,"Contraction outside protected areas", "Expansion outside protected areas")
-# 
-# (s4<- ggplot(mamm_model, aes(x = diet, fill = expansion, color = expansion)) +
-#   geom_density(alpha =.5) +  labs(x = "Diet specialization (scaled)" , y = "Density")+
-#   scale_fill_manual(values =  c( "orange","grey20")) +
-#   scale_color_manual(values =  c("orange","grey20")) + theme_bw() + theme_ggplot + theme(legend.title = element_blank(),
-#                                                                                          legend.position = c(0.2, 0.88),
-#                                                                                          legend.background = element_rect(fill='transparent'))
-#   )
-# 
-# pdf("Figures/Figure S4.pdf", width = 8, height = 4)
-# s4
-# dev.off()
 
 # Plotting the value on the phylogeny -------------------------------------
 
@@ -1091,6 +1056,51 @@ pdf(file = "Figures/Figure S5.pdf", width = 10, height = 4)
 
 p9
 
+dev.off()
+
+# Checking the difference in volume and beta withing and outside ----------
+
+(p1 <- ggplot(data = db[db$Group == "bird" & db$naxes > 5,],  #if only 7 axes are shown, we lose year 2000s
+              aes(x = year, y = delta_vol)) +
+   geom_point(aes(x = year, y = delta_vol), 
+              position = position_jitter(width = 0.15), size = 1, alpha = 0.2) +
+   geom_boxplot(width = 0.4, outlier.shape = NA, alpha = 0.4, fill="grey50") +
+   geom_hline(yintercept=0,col="blue",lty="dotted")+
+   labs(title = "A", subtitle = "Birds",
+        y = "Delta volume\n(Volume in protected - unprotected)", x = NULL) +
+   guides(fill = "none", color = "none") +
+   theme_classic() + theme_ggplot
+)
+
+(p2 <- ggplot(data = db[db$Group == "mammal" & db$naxes > 6,], 
+              aes(x = year, y = delta_vol)) +
+    geom_point(aes(x = year, y = delta_vol), 
+               position = position_jitter(width = 0.15), size = 1, alpha = 0.2) +
+    geom_boxplot(width = 0.4, outlier.shape = NA, alpha = 0.4, fill="grey50") +
+    geom_hline(yintercept=0,col="blue",lty="dotted")+
+    labs(title = "B", subtitle = "Mammal", 
+         y = "Delta volume\n(Volume in protected - unprotected)", x = NULL) +
+    
+    guides(fill = "none", color = "none") +
+    theme_classic() + theme_ggplot
+)
+
+## Supplementary Figures S4
+plots <- list(p1, p2) ; grobs <- list() ; widths <- list()
+
+for (i in 1:length(plots)){
+  grobs[[i]] <- ggplotGrob(plots[[i]])
+  widths[[i]] <- grobs[[i]]$widths[2:5]
+}
+
+maxwidth <- do.call(grid::unit.pmax, widths)
+
+for (i in 1:length(grobs)){
+  grobs[[i]]$widths[2:5] <- as.list(maxwidth)
+}
+
+pdf("Figures/Figure S4.pdf", width = 10, height = 4)
+do.call("grid.arrange", c(grobs, nrow = 1, ncol = 2))
 dev.off()
 
 # End 

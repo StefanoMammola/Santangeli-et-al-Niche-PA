@@ -259,7 +259,7 @@ mod1$Variable <- factor(mod1$Variable, rev(custom.label))
     labs(title = "C - Habitat shift",
          y = "Estimate [95% Confidence interval]",
          x = NULL) + 
-    ylim(-1,1)+
+    ylim(-1.2,1.2)+
     coord_flip() +
     annotation_custom(grid::rasterGrob(Silu_bird),
                       xmin = unit(0.7, "native"), xmax = unit(1.2,"native"),

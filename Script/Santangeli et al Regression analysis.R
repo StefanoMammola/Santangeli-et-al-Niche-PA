@@ -46,6 +46,8 @@ theme_ggplot <- theme(
   plot.title = element_text(face="bold", size=12)
 )
 
+custom.label <- c("Body mass", "Habitat\nspecialization", "Diet\nspecialization", "Carnivore", "Red list status\n[threatened]")
+
 # Loading silhouettes for figures ------------------------------------------
 
 # Taken from PhyloPic (http://phylopic.org/) with open license.
@@ -236,18 +238,34 @@ phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
 # P-value (based on LR test) : 1 
 
 # No phylo signal in the residuals!
-(p3 <- sjPlot::plot_model(bird_M1, sort.est = FALSE, se = FALSE, col="black", ci.lvl = .95,
-                   vline.color = "grey70",
-                   title = "C - Habitat shift",
-                   show.values = TRUE, value.offset = .3,
-                   axis.labels = c("Red list status\n[threatened]","Carnivore","Diet\nspecialization",
-                                   "Habitat\nspecialization","Body mass")) +
-    
-                  annotation_custom(grid::rasterGrob(Silu_bird),
-                                    xmin = unit(1, "native"), xmax = unit(1.8,"native"),
-                                    ymin = unit(0.3,"npc"),  ymax = unit(1,"npc"))+ 
-  
-               theme_bw() + ylab("Estimated beta [95% Confidence interval]") + theme_ggplot)
+
+mod <- parameters::model_parameters(bird_M1) 
+
+mod1 <- data.frame(Variable  = mod$Parameter[2:6],
+                   Estimate  = mod$Coefficient[2:6],
+                   CI_low    = mod$CI_low[2:6],
+                   CI_high   = mod$CI_high[2:6]) ; rm(mod)
+
+mod1$Variable <- custom.label
+mod1$Variable <- factor(mod1$Variable, rev(custom.label)) 
+
+(p3 <- ggplot2::ggplot(data = mod1, aes(Variable,Estimate)) +
+    geom_hline(lty = 3, size = 0.7, col = "grey50", yintercept = 0) +
+    geom_errorbar(aes(ymin = CI_low, ymax = CI_high), width = 0, col = "grey10") +
+    geom_point(size = 2, pch = 21, col = "grey10", fill = "grey20") +
+    geom_text(aes(Variable, Estimate), 
+              label = round(mod1$Estimate,2), 
+              vjust = -1, size = 3) +
+    labs(title = "C - Habitat shift",
+         y = "Estimate [95% Confidence interval]",
+         x = NULL) + 
+    ylim(-1,1)+
+    coord_flip() +
+    annotation_custom(grid::rasterGrob(Silu_bird),
+                      xmin = unit(0.7, "native"), xmax = unit(1.2,"native"),
+                      ymin = unit(0.7,"npc"),  ymax = unit(1,"npc"))+ 
+    theme_bw() + 
+    theme_ggplot)
 
 # Model for expantion/contraction
 
@@ -321,18 +339,33 @@ phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
 
 # No phylo signal in the residuals! 
 
-(p1 <- sjPlot::plot_model(bird_M2, sort.est = FALSE, se = FALSE, col="black", ci.lvl = .95,
-                   vline.color ="grey70",
-                   title = "A - Niche expansion",
-                   show.values = TRUE, value.offset = .3, axis.title = " ",
-                   axis.labels = c("Red list status\n[threatened]","Carnivore","Diet\nspecialization",
-                                   "Habitat\nspecialization","Body mass")) +
-                    
-                     annotation_custom(grid::rasterGrob(Silu_bird),
-                      xmin = unit(1, "native"), xmax = unit(1.8,"native"),
-                      ymin = unit(0.3,"npc"),  ymax = unit(1,"npc"))+ 
-  
-                   theme_bw() + theme_ggplot)
+mod <- parameters::model_parameters(bird_M2) 
+
+mod2 <- data.frame(Variable  = mod$Parameter[2:6],
+                   Estimate  = mod$Coefficient[2:6],
+                   CI_low    = mod$CI_low[2:6],
+                   CI_high   = mod$CI_high[2:6]) ; rm(mod)
+
+mod2$Variable <- custom.label
+mod2$Variable <- factor(mod1$Variable, rev(custom.label)) 
+
+(p1 <- ggplot2::ggplot(data = mod2, aes(Variable,Estimate)) +
+    geom_hline(lty = 3, size = 0.7, col = "grey50", yintercept = 0) +
+    geom_errorbar(aes(ymin = CI_low, ymax = CI_high), width = 0, col = "grey10") +
+    geom_point(size = 2, pch = 21, col = "grey10", fill = "grey20") +
+    geom_text(aes(Variable, Estimate), 
+              label = round(mod2$Estimate,2), 
+              vjust = -1, size = 3) +
+    labs(title = "A - Niche expansion",
+         y = NULL,
+         x = NULL) + 
+    ylim(-1.2,1.2)+
+    coord_flip() +
+    annotation_custom(grid::rasterGrob(Silu_bird),
+                      xmin = unit(0.7, "native"), xmax = unit(1.2,"native"),
+                      ymin = unit(0.7,"npc"),  ymax = unit(1,"npc"))+ 
+    theme_bw() + 
+    theme_ggplot)
 
 # Analysis with mammals -----------------------------------------------------
 
@@ -472,19 +505,33 @@ phylosig(mammTREE, mamm_test$residuals, method = "lambda", test = TRUE)
 
 # No phylo signal in the residuals! 
 
-(p4 <- sjPlot::plot_model(mamm_M1, sort.est = FALSE, se = FALSE, col = "black", ci.lvl = .95,
-                   vline.color ="grey70",
-                   title = "D - Habitat shift",
-                   show.values = TRUE, value.offset = .3,
-                   axis.labels = c(rep(" ",5))) + theme_bw() + 
-    
-                    annotation_custom(grid::rasterGrob(Silu_mamm),
-                      xmin = unit(0.8, "native"), xmax = unit(1.5,"native"),
-                      ymin = unit(0.3,"npc"),  ymax = unit(1.2,"npc"))+ 
-    
-             ylab("Estimated beta [95% Confidence interval]") +
-    
-                   theme_ggplot)
+mod <- parameters::model_parameters(mamm_M1) 
+
+mod3 <- data.frame(Variable  = mod$Parameter[2:6],
+                   Estimate  = mod$Coefficient[2:6],
+                   CI_low    = mod$CI_low[2:6],
+                   CI_high   = mod$CI_high[2:6]) ; rm(mod)
+
+mod3$Variable <- custom.label
+mod3$Variable <- factor(mod3$Variable, rev(custom.label)) 
+
+(p4 <- ggplot2::ggplot(data = mod3, aes(Variable,Estimate)) +
+    geom_hline(lty = 3, size = 0.7, col = "grey50", yintercept = 0) +
+    geom_errorbar(aes(ymin = CI_low, ymax = CI_high), width = 0, col = "grey10") +
+    geom_point(size = 2, pch = 21, col = "grey10", fill = "grey20") +
+    geom_text(aes(Variable, Estimate), 
+              label = round(mod3$Estimate,2), 
+              vjust = -1, size = 3) +
+    labs(title = "D - Habitat shift",
+         y = "Estimate [95% Confidence interval]",
+         x = NULL) + 
+    ylim(-1.2,1.2)+
+    coord_flip() +
+    annotation_custom(grid::rasterGrob(Silu_mamm),
+                      xmin = unit(0.7, "native"), xmax = unit(1.2,"native"),
+                      ymin = unit(0.7,"npc"),  ymax = unit(1,"npc"))+ 
+    theme_bw() + 
+    theme_ggplot + theme(axis.text.y=element_blank()))
 
 # Adding jitter for modelling
 mamm_model$beta_diff <- ifelse(mamm_model$beta_diff == 0, 
@@ -542,17 +589,33 @@ phylosig(mammTREE, mamm_test$residuals, method = "lambda", test = TRUE)
 
 # No phylo signal in the residuals!
 
-(p2 <- sjPlot::plot_model(mamm_M2, sort.est = FALSE, se = FALSE, col = "black", ci.lvl = .95,
-                   vline.color ="grey70",
-                   title = "B - Niche expansion", axis.title = " ",
-                   show.values = TRUE, value.offset = .3,
-                   axis.labels = c(rep(" ",5))) +
-    
-                   annotation_custom(grid::rasterGrob(Silu_mamm),
-                      xmin = unit(1, "native"), xmax = unit(2,"native"),
-                      ymin = unit(0.3,"npc"),  ymax = unit(.7,"npc"))+ 
-                  
-                    theme_bw() + theme_ggplot)
+mod <- parameters::model_parameters(mamm_M2) 
+
+mod4 <- data.frame(Variable  = mod$Parameter[2:6],
+                   Estimate  = mod$Coefficient[2:6],
+                   CI_low    = mod$CI_low[2:6],
+                   CI_high   = mod$CI_high[2:6]) ; rm(mod)
+
+mod4$Variable <- custom.label
+mod4$Variable <- factor(mod4$Variable, rev(custom.label)) 
+
+(p2 <- ggplot2::ggplot(data = mod4, aes(Variable,Estimate)) +
+    geom_hline(lty = 3, size = 0.7, col = "grey50", yintercept = 0) +
+    geom_errorbar(aes(ymin = CI_low, ymax = CI_high), width = 0, col = "grey10") +
+    geom_point(size = 2, pch = 21, col = "grey10", fill = "grey20") +
+    geom_text(aes(Variable, Estimate), 
+              label = round(mod4$Estimate,2), 
+              vjust = -1, size = 3) +
+    labs(title = "B - Niche expansion",
+         y = NULL,
+         x = NULL) + 
+    ylim(-1.2,1.2)+
+    coord_flip() +
+    annotation_custom(grid::rasterGrob(Silu_mamm),
+                      xmin = unit(0.7, "native"), xmax = unit(1.2,"native"),
+                      ymin = unit(0.7,"npc"),  ymax = unit(1,"npc"))+ 
+    theme_bw() + 
+    theme_ggplot + theme(axis.text.y=element_blank()))
 
 # Arranging in a plot ------------------------------------------------------
 

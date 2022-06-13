@@ -247,7 +247,7 @@ phylosig(birdTREE2, birds_test$residuals, method = "lambda", test = TRUE)
                                     xmin = unit(1, "native"), xmax = unit(1.8,"native"),
                                     ymin = unit(0.3,"npc"),  ymax = unit(1,"npc"))+ 
   
-               theme_bw() + ylab("Estimated beta [95% Confenfidence interval]") + theme_ggplot)
+               theme_bw() + ylab("Estimated beta [95% Confidence interval]") + theme_ggplot)
 
 # Model for expantion/contraction
 
@@ -482,7 +482,7 @@ phylosig(mammTREE, mamm_test$residuals, method = "lambda", test = TRUE)
                       xmin = unit(0.8, "native"), xmax = unit(1.5,"native"),
                       ymin = unit(0.3,"npc"),  ymax = unit(1.2,"npc"))+ 
     
-             ylab("Estimated beta [95% Confenfidence interval]") +
+             ylab("Estimated beta [95% Confidence interval]") +
     
                    theme_ggplot)
 
